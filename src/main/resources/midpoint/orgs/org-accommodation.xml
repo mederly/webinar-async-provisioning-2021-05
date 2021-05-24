@@ -1,6 +1,7 @@
 <org xmlns="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
       oid="4bf0ad56-ab35-4f89-a869-e09a7b39a37d">
     <name>accommodation</name>
+    <parentOrgRef oid="3fadf504-7de8-45e8-a60b-174be1a97bb0" />
     <assignment>
         <targetRef oid="3fadf504-7de8-45e8-a60b-174be1a97bb0" type="OrgType"/>
     </assignment>

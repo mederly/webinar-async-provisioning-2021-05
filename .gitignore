@@ -2,3 +2,4 @@
 /target/
 credentials.kdbx
 .idea
+*.iml
