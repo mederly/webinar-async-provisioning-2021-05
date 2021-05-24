@@ -1,0 +1,14 @@
+login,givenName,familyName,email,faculty,accommodation
+jsmith,Joe,Smith,jsmith@example.edu,fns,N
+banderson,Bob,Anderson,banderson@example.edu,fmph,N
+kwhite,Karl,White,kwhite@example.edu,fedu,N
+whenderson,William,Henderson,whenderson@example.edu,fmph,N
+ddavis,David,Davis,ddavis@example.edu,fm,N
+cmorrison,Colin,Morrison,cmorrison@example.edu,fpharm,N
+danderson,Donna,Anderson,danderson@example.edu,fmed,N
+wprice,William,Price,wprice@example.edu,fsport,N
+mroberts,Marie,Roberts,mroberts@example.edu,fns,N
+kjohnson,Kiersten,Johnson,kjohnson@example.edu,fmed,N
+jbrown,James,Brown,jbrown@example.edu,fpharm,N
+agasper,Ann,Gasper,agasper@example.edu,fsport,N
+jscott,Jennifer,Scott,jscott@example.edu,fedu,N

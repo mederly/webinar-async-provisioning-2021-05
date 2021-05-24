@@ -1,0 +1,105 @@
+= Sample Asynchronous Application for Evolveum Webinar on May 27th, 2021
+
+== Requirements
+
+1. Java 11
+2. Maven 3.6+ (tested with 3.6.3)
+3. ActiveMQ Artemis 2.x (tested on 2.17.0)
+4. midPoint 4.3.1
+5. midPoint Studio 4.3 (recommended)
+
+== Setup Required Software
+
+=== ActiveMQ Artemis Setup
+
+NOTE: This assumes Windows installation. The setup on Linux is similar.
+
+1. Install ActiveMQ Artemis in selected directory, e.g. `d:\mp-home\apache-artemis-2.17.0`. Let's call this directory `<ARTEMIS-INSTALLATION-DIR>`.
+2. Create empty directory for the broker, e.g. `d:\mp-home\_broker`. Let's call this directory `<BROKER-DIR>`.
+3. Go to the `<ARTEMIS-INSTALLATION-DIR>\bin` directory and execute the following command:
+
+   artemis.cmd create <BROKER-DIR> --user admin --password admin123 --require-login
+
+4. Start ActiveMQ broker by executing
+
+   <BROKER-DIR>\bin\artemis run
+
+5. Check that it is running by opening the console at http://localhost:8161/console.
+
+=== MidPoint Setup
+
+1. Install midPoint 4.3.1 in a selected directory, e.g. `d:\mp-home\midpoint-4.3.1`. Let's call this directory `<MIDPOINT-INSTALLATION-DIR>`.
+
+2. Start midPoint by going into `<MIDPOINT-INSTALLATION-DIR>` directory and running the command
+
+   bin\start
+
+3. Check that midPoint is running by opening the GUI at http://localhost:8080/midpoint.
+
+== Specific Scenario Setup
+
+=== Setting Up Message Queues
+
+1. Stop Artemis broker e.g. by hitting Ctrl-C in its console window.
+
+2. Add the following to the `<BROKER-DIR>/etc/broker.xml` file under `<addresses>` element:
+
+         <address name="TestQueue">
+            <anycast>
+               <queue name="TestQueue"/>
+            </anycast>
+         </address>
+         <address name="DormitoryRequestsQueue">
+            <anycast>
+               <queue name="DormitoryRequestsQueue"/>
+            </anycast>
+         </address>
+
+3. Start the broker again.
+
+4. Verify that the `TestQueue` and `DormitoryRequestsQueue` are visible in the Artemis console.
+
+=== Preparing Test Dormitory Application
+
+1. Unpack this repository to a directory e.g. `d:\tmp\webinar-async-provisioning-2021-05`. Let's call this directory `<WEBINAR-DIR>`:
+
+   git clone https://github.com/mederly/webinar-async-provisioning-2021-05
+
+2. Build the code.
+
+   mvn clean install
+
+3. Run the client. (A GUI window should appear.)
+
+   mvn exec:java
+
+=== Providing JNDI Configuration to MidPoint
+
+1. Copy `<WEBINAR-DIR>/target/webinar-async-provisioning-2021-05-1.0-SNAPSHOT-jndi.jar` to
+`<MIDPOINT-INSTALLATION-DIR>/var/lib` directory. (Beware! Not into `<MIDPOINT-INSTALLATION-DIR>/lib` one.)
+
+2. Restart midPoint.
+
+=== Uploading MidPoint Objects
+
+1. Edit CSV file path in `<WEBINAR-DIR>/src/main/resources/midpoint/resources/resource-students.xml` to match the actual CSV file placement.
+
+2. Upload files in `<WEBINAR-DIR>/src/main/resources/midpoint` (except for `tasks` directory) into running midPoint.
+
+3. Test all three resources:
+- students (CSV)
+- Dormitory Test (async)
+- Dormitory (async)
+
+== Running The Scenario
+
+1. Import the `Import Students (CSV)` task (`import-students.xml` file) into midPoint and check that
+it finishes and 12 users are successfully created in midPoint.
+
+2. Try to assign/unassign some users to the `Accommodation` org and verify that the "accounts" are
+created in the sample Dormitory app.
+
+3. Unassign all the users from `Accommodation` org.
+
+4. Start the `Live Sync Students (CSV)` task and try to change the content of the `students.csv` file.
+Observe the related changes in the Dormitory app.

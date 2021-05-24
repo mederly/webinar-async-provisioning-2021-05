@@ -1,0 +1,13 @@
+<org xmlns="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
+      oid="4bf0ad56-ab35-4f89-a869-e09a7b39a37d">
+    <name>accommodation</name>
+    <assignment>
+        <targetRef oid="3fadf504-7de8-45e8-a60b-174be1a97bb0" type="OrgType"/>
+    </assignment>
+    <displayName>Accommodation</displayName>
+    <inducement>
+        <construction>
+            <resourceRef oid="b94bbac2-1d39-41b9-ac36-d933cc0295d4"/>
+        </construction>
+    </inducement>
+</org>
