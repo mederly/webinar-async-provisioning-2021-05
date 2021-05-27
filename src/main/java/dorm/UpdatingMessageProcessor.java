@@ -4,6 +4,8 @@ import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 import static dorm.LoggerUtil.prefix;
 
 /**
@@ -15,6 +17,7 @@ import static dorm.LoggerUtil.prefix;
  * - execution (delegated)
  * - error reporting
  * - refreshing the view
+ * - updating CSV file
  */
 class UpdatingMessageProcessor implements MessageProcessor {
 
@@ -41,5 +44,14 @@ class UpdatingMessageProcessor implements MessageProcessor {
 
         operation.execute(students);
         viewUpdater.run();
+        updateCsvFile();
+    }
+
+    private void updateCsvFile() {
+        try {
+            CsvFile.INSTANCE.writeFrom(students);
+        } catch (IOException e) {
+            logger.warn("Couldn't update CSV file", e);
+        }
     }
 }

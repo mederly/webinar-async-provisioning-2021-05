@@ -45,6 +45,11 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.3e1</version>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.4</version>
+        </dependency>
 
         <!-- midPoint plugin -->
         <dependency>

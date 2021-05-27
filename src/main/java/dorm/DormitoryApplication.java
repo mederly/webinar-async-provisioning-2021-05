@@ -1,5 +1,6 @@
 package dorm;
 
+import com.opencsv.exceptions.CsvValidationException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,10 +15,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 /**
  * The main class.
  *
  * Responsibilities:
+ *
  * - Maintains the data about students
  * - Creates and displays the table of students
  * - Starts the listening for messages
@@ -26,7 +30,7 @@ public class DormitoryApplication extends Application {
 
     private final TableView<Student> table = new TableView<>();
 
-    private final ObservableList<Student> data =
+    private final ObservableList<Student> students =
             FXCollections.observableArrayList();
 
     public static void main(String[] args) {
@@ -34,11 +38,19 @@ public class DormitoryApplication extends Application {
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException, CsvValidationException {
+        readCsvFile();
         createScene(stage);
         startListener();
 
         stage.show();
+    }
+
+    private void readCsvFile() throws IOException, CsvValidationException {
+        boolean exists = CsvFile.INSTANCE.readInto(students);
+        if (!exists) {
+            CsvFile.INSTANCE.writeFrom(students);
+        }
     }
 
     private void createScene(Stage stage) {
@@ -72,7 +84,7 @@ public class DormitoryApplication extends Application {
         facultyCol.setMinWidth(500);
         facultyCol.setCellValueFactory(new PropertyValueFactory<>("faculty"));
 
-        table.setItems(data);
+        table.setItems(students);
         //noinspection unchecked
         table.getColumns().addAll(loginCol, givenNameCol, familyNameCol, emailCol, facultyCol);
 
@@ -88,6 +100,6 @@ public class DormitoryApplication extends Application {
     }
 
     private void startListener() {
-        QueueListener.start(new UpdatingMessageProcessor(data, table::refresh));
+        QueueListener.start(new UpdatingMessageProcessor(students, table::refresh));
     }
 }

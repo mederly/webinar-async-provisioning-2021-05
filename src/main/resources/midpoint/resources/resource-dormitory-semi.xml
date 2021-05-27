@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource oid="b94bbac2-1d39-41b9-ac36-d933cc0295d4"
+          xmlns="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
+          xmlns:q="http://prism.evolveum.com/xml/ns/public/query-3"
+          xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3"
+          xmlns:cap="http://midpoint.evolveum.com/xml/ns/public/resource/capabilities-3"
+          xmlns:icfc="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/connector-schema-3"
+          xmlns:csvconf="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/bundle/com.evolveum.polygon.connector-csv/com.evolveum.polygon.connector.csv.CsvConnector"
+          xmlns:conf="http://midpoint.evolveum.com/xml/ns/public/connector/builtin-1/bundle/com.evolveum.midpoint.provisioning.ucf.impl.builtin.async.provisioning/AsyncProvisioningConnector">
+
+    <name>Dormitory (async, combined with CSV - does not work in midpoint 4.3)</name>
+    <documentation>
+        This is an experiment to see if asynchronous target resource can be used in a mode similar
+        to semi-manual resources: it would process requests, and present (possibly with delay) its
+        current state in the form of e.g. CSV file. However,
+    </documentation>
+    <connectorRef type="ConnectorType">
+        <filter>
+            <q:equal>
+                <q:path>connectorType</q:path>
+                <q:value>AsyncProvisioningConnector</q:value>
+            </q:equal>
+        </filter>
+    </connectorRef>
+    <connectorConfiguration>
+        <conf:targets>
+            <jms>
+                <connectionFactory>localhostConnectionFactory</connectionFactory>
+                <username>admin</username>
+                <password>admin123</password>
+                <destination>DormitoryRequestsQueue</destination>
+            </jms>
+        </conf:targets>
+        <conf:transformExpression>
+            <script>
+                <language>http://midpoint.evolveum.com/xml/ns/public/expression/language#velocity</language>
+                <code>#set ( $request = $requestFormatter.changeMapAsAttributes().identifiersAsAttributes().createRequest() )
+#set ( $attrs = $request.attributesSimplified )
+#if ($request.isDelete())
+delete
+$!attrs["login"]
+#else
+addOrUpdate
+$!attrs["login"]
+gn: $!attrs["givenName"]
+fn: $!attrs["familyName"]
+m: $!attrs["email"]
+f: $!attrs["faculty"]
+#end</code>
+            </script>
+        </conf:transformExpression>
+        <conf:operationExecutionConfirmation>true</conf:operationExecutionConfirmation>
+    </connectorConfiguration>
+
+    <additionalConnector>
+        <name>csv</name>
+        <connectorRef type="ConnectorType">
+            <filter>
+                <q:equal>
+                    <q:path>connectorType</q:path>
+                    <q:value>com.evolveum.polygon.connector.csv.CsvConnector</q:value>
+                </q:equal>
+            </filter>
+        </connectorRef>
+        <connectorConfiguration>
+            <icfc:configurationProperties>
+                <csvconf:filePath>D:\tmp\webinar-async-provisioning-2021-05\accounts.csv</csvconf:filePath>
+                <csvconf:encoding>utf-8</csvconf:encoding>
+                <csvconf:fieldDelimiter>,</csvconf:fieldDelimiter>
+                <csvconf:uniqueAttribute>login</csvconf:uniqueAttribute>
+            </icfc:configurationProperties>
+        </connectorConfiguration>
+        <capabilities>
+            <configured>
+                <cap:liveSync>
+                    <cap:enabled>false</cap:enabled>
+                </cap:liveSync>
+                <cap:create>
+                    <cap:enabled>false</cap:enabled>
+                </cap:create>
+                <cap:update>
+                    <cap:enabled>false</cap:enabled>
+                </cap:update>
+                <cap:delete>
+                    <cap:enabled>false</cap:enabled>
+                </cap:delete>
+                <cap:script>
+                    <cap:enabled>false</cap:enabled>
+                </cap:script>
+                <cap:activation>
+                    <cap:status>
+                        <cap:attribute>ri:disabled</cap:attribute>
+                        <cap:enableValue>false</cap:enableValue>
+                        <cap:disableValue>true</cap:disableValue>
+                    </cap:status>
+                </cap:activation>
+            </configured>
+        </capabilities>
+    </additionalConnector>
+
+    <schemaHandling>
+        <objectType>
+            <objectClass>ri:AccountObjectClass</objectClass>
+            <attribute>
+                <ref>ri:login</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <path>name</path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:givenName</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <path>givenName</path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:familyName</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <path>familyName</path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:email</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <path>emailAddress</path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:faculty</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <path>organization</path>
+                    </source>
+                    <expression>
+                        <script>
+                            <relativityMode>absolute</relativityMode>
+                            <code>
+                                organization?.join('; ') // usually 0 or 1 organizations
+                            </code>
+                        </script>
+                    </expression>
+                </outbound>
+            </attribute>
+        </objectType>
+    </schemaHandling>
+    <capabilities>
+        <configured>
+            <cap:update>
+                <cap:attributeContentRequirement>all</cap:attributeContentRequirement>
+            </cap:update>
+        </configured>
+    </capabilities>
+    <consistency>
+        <shadowConstraintsCheck>light</shadowConstraintsCheck>
+        <pendingOperationGracePeriod>PT15M</pendingOperationGracePeriod>
+        <pendingOperationRetentionPeriod>PT30M</pendingOperationRetentionPeriod>
+        <deadShadowRetentionPeriod>PT2H</deadShadowRetentionPeriod>
+    </consistency>
+</resource>
