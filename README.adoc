@@ -4,7 +4,7 @@
 
 1. Java 11
 2. Maven 3.6+ (tested with 3.6.3)
-3. ActiveMQ Artemis 2.x (tested on 2.17.0)
+3. ActiveMQ Artemis 2.x (tested with 2.17.0)
 4. midPoint 4.3.1
 5. midPoint Studio 4.3 (recommended)
 
@@ -14,8 +14,8 @@
 
 NOTE: This assumes Windows installation. The setup on Linux is similar.
 
-1. Install ActiveMQ Artemis in selected directory, e.g. `d:\mp-home\apache-artemis-2.17.0`. Let's call this directory `<ARTEMIS-INSTALLATION-DIR>`.
-2. Create empty directory for the broker, e.g. `d:\mp-home\_broker`. Let's call this directory `<BROKER-DIR>`.
+1. Install ActiveMQ Artemis in selected directory, e.g. `d:\apache-artemis-2.17.0`. Let's call this directory `<ARTEMIS-INSTALLATION-DIR>`.
+2. Create empty directory for the broker, e.g. `d:\tmp\broker`. Let's call this directory `<BROKER-DIR>`.
 3. Go to the `<ARTEMIS-INSTALLATION-DIR>\bin` directory and execute the following command:
 
    artemis.cmd create <BROKER-DIR> --user admin --password admin123 --require-login
@@ -28,7 +28,7 @@ NOTE: This assumes Windows installation. The setup on Linux is similar.
 
 === MidPoint Setup
 
-1. Install midPoint 4.3.1 in a selected directory, e.g. `d:\mp-home\midpoint-4.3.1`. Let's call this directory `<MIDPOINT-INSTALLATION-DIR>`.
+1. Install midPoint 4.3.1 in a selected directory, e.g. `d:\tmp\midpoint-4.3.1`. Let's call this directory `<MIDPOINT-INSTALLATION-DIR>`.
 
 2. Start midPoint by going into `<MIDPOINT-INSTALLATION-DIR>` directory and running the command
 
